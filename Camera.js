@@ -3,6 +3,7 @@ import { Text, View } from "react-native";
 import { Camera } from "expo-camera";
 import * as FaceDetector from "expo-face-detector";
 import * as Permissions from "expo-permissions";
+import { Icon, Button } from "native-base";
 
 export default class CameraComponent extends Component {
   state = {
@@ -28,7 +29,8 @@ export default class CameraComponent extends Component {
                   width: res.faces[0].bounds.size.width,
                   height: res.faces[0].bounds.size.height,
                   marginLeft: res.faces[0].bounds.origin.x,
-                  marginTop: res.faces[0].bounds.origin.y
+                  marginTop: res.faces[0].bounds.origin.y,
+                  smillingProbability: res.faces[0].smilingProbability
                 }
               });
             }
@@ -46,23 +48,41 @@ export default class CameraComponent extends Component {
           faceDetectorSettings={{
             mode: FaceDetector.Constants.Mode.fast,
             detectLandmarks: FaceDetector.Constants.Landmarks.none,
-            runClassifications: FaceDetector.Constants.Classifications.none,
+            runClassifications: FaceDetector.Constants.Classifications.all,
             minDetectionInterval: 100,
             tracking: true
           }}
         >
           {Object.keys(this.state.faceSquare) ? (
-            <View
-              style={{
-                borderWidth: 1,
-                borderColor: "red",
-                borderStyle: "solid",
-                width: this.state.faceSquare.width,
-                height: this.state.faceSquare.height,
-                marginLeft: this.state.faceSquare.marginLeft,
-                marginTop: this.state.faceSquare.marginTop
-              }}
-            ></View>
+            <View>
+              <View
+                style={{
+                  borderWidth: 2,
+                  borderColor:
+                    this.state.faceSquare.smillingProbability > 0.7
+                      ? "green"
+                      : "red",
+                  borderStyle: "solid",
+                  width: this.state.faceSquare.width,
+                  height: this.state.faceSquare.height,
+                  marginLeft: this.state.faceSquare.marginLeft,
+                  marginTop: this.state.faceSquare.marginTop
+                }}
+              ></View>
+              {this.state.faceSquare.smillingProbability > 0.7 ? (
+                <Button
+                  style={{
+                    backgroundColor: "#007AFF",
+                    width: 60,
+                    height: 50,
+                    alignSelf: "center",
+                    marginTop: 10
+                  }}
+                >
+                  <Icon active name="smile" type="FontAwesome5" />
+                </Button>
+              ) : null}
+            </View>
           ) : null}
         </Camera>
       </View>
